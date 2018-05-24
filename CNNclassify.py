@@ -46,32 +46,8 @@ C1_relu = tf.nn.relu(C1)
 # 2*2 Max pooling
 max_pool_C1 = tf.nn.max_pool(value=C1_relu, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
 
-# Convolutional layer 2 with relu --------------> filter size = 5*5 , stride = 1 , number of filters = 64
-wC2 = tf.get_variable("wC2", shape=[5, 5, 32, 64])
-bC2 = tf.get_variable("bC2", shape=[64])
-C2 = tf.nn.conv2d(max_pool_C1, wC2, strides=[1, 1, 1, 1], padding='SAME') + bC2
-C2_relu = tf.nn.relu(C2)
-# 2*2 Max pooling
-max_pool_C2 = tf.nn.max_pool(value=C2_relu, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-
-# Convolutional layer 3 with relu--------------> filter size = 5*5 , stride = 1 , number of filters = 64
-wC3 = tf.get_variable("wC3", shape=[5, 5, 64, 64])
-bC3 = tf.get_variable("bC3", shape=[64])
-C3 = tf.nn.conv2d(max_pool_C2, wC3, strides=[1, 1, 1, 1], padding='SAME') + bC3
-C3_relu = tf.nn.relu(C3)
-# 2*2 Max pooling
-max_pool_C3 = tf.nn.max_pool(value=C3_relu, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-
-# Convolutional layer 4 with relu--------------> filter size = 5*5 , stride = 1 , number of filters = 64
-wC4 = tf.get_variable("wC4", shape=[5, 5, 64, 64])
-bC4 = tf.get_variable("bC4", shape=[64])
-C4 = tf.nn.conv2d(max_pool_C3, wC4, strides=[1, 1, 1, 1], padding='SAME') + bC4
-C4_relu = tf.nn.relu(C4)
-# 2*2 Max pooling
-max_pool_C4 = tf.nn.max_pool(value=C4_relu, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-
-shape = max_pool_C4.get_shape().as_list()
-reshape = tf.reshape(max_pool_C4, [-1, shape[1] * shape[2] * shape[3]])
+shape = max_pool_C1.get_shape().as_list()
+reshape = tf.reshape(max_pool_C1, [-1, shape[1] * shape[2] * shape[3]])
 
 # Fully connected layer 1
 w_FC1 = tf.get_variable("w_FC1", shape=[shape[1] * shape[2] * shape[3], 1024])
@@ -80,14 +56,7 @@ FC1_output = tf.matmul(reshape, w_FC1) + b_FC1
 FC1_relu = tf.nn.relu(FC1_output)
 FC1_reshape = tf.reshape(FC1_relu, [-1, 1024])
 
-# Fully connected layer 2
-w_FC2 = tf.get_variable("w_FC2", shape=[1024, 128])
-b_FC2 = tf.get_variable("b_FC2", shape=[128])
-FC2_output = tf.matmul(FC1_reshape, w_FC2) + b_FC2
-FC2_relu = tf.nn.relu(FC2_output)
-FC2_reshape = tf.reshape(FC2_relu, [-1, 128])
-
-dropout = tf.nn.dropout(FC2_reshape, 0.5)
+dropout = tf.nn.dropout(FC1_reshape, 0.5)
 
 # Output layer
 w_out = tf.get_variable("w_out", shape=[128, 10])
